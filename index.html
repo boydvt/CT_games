@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Algo Arcade - Game Berpikir Komputasional</title>
+<style>
+:root{--v:#7c5cff;--c:#22e1ff;--p:#ff4fa3;--l:#b6ff5c;--y:#ffd36b;--ink:#f5f7ff;--mut:#c4cbf5;--glass:rgba(255,255,255,.09);--line:rgba(255,255,255,.22);--mx:50%;--my:50%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;font:18px/1.5 "Segoe UI","Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#070a24;overflow-x:hidden;user-select:none}
+.bg{position:fixed;inset:0;z-index:-2;background:linear-gradient(135deg,#0a0d33,#1f0f55 50%,#06303f);background-size:200% 200%;animation:shift 18s ease infinite}
+.bg i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 22s ease-in-out infinite alternate}
+.bg i:nth-child(1){width:46vmax;height:46vmax;background:var(--v);left:-10vmax;top:-12vmax}
+.bg i:nth-child(2){width:38vmax;height:38vmax;background:var(--c);right:-10vmax;top:20vh;animation-duration:27s}
+.bg i:nth-child(3){width:34vmax;height:34vmax;background:var(--p);left:25vw;bottom:-18vmax;animation-duration:31s}
+@keyframes shift{50%{background-position:100% 100%}}
+@keyframes drift{to{transform:translate(8vmax,-6vmax) scale(1.2)}}
+#fx{position:fixed;inset:0;z-index:20;pointer-events:none}
+#glow{position:fixed;left:0;top:0;width:460px;height:460px;margin:-230px 0 0 -230px;border-radius:50%;background:radial-gradient(circle,rgba(34,225,255,.28),rgba(124,92,255,.14) 45%,transparent 70%);pointer-events:none;z-index:-1;mix-blend-mode:screen}
+.sym{position:fixed;bottom:-60px;z-index:-1;font:700 1.6rem Consolas,monospace;color:#fff;opacity:.12;animation:up linear infinite;pointer-events:none}
+@keyframes up{to{transform:translateY(-120vh) rotate(40deg)}}
+header{position:sticky;top:12px;z-index:5;display:flex;align-items:center;gap:10px;margin:12px auto 0;max-width:1000px;width:calc(100% - 24px);padding:10px 16px;border-radius:22px}
+header h1{font-size:1.1rem;margin:0;flex:1;cursor:pointer}
+.gl,header,.box,.card,.cust,.peg,#help .box{background:var(--glass);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 16px 40px rgba(0,0,0,.32)}
+.pill{padding:6px 14px;border-radius:99px;font-weight:800;color:var(--y);background:rgba(255,211,107,.12);border:1px solid rgba(255,211,107,.45)}
+button{font:inherit;cursor:pointer;border:0;border-radius:14px;padding:10px 18px;color:#06122b;font-weight:800;background:linear-gradient(135deg,var(--c),var(--l));box-shadow:0 8px 22px rgba(34,225,255,.3);transition:transform .15s,box-shadow .2s,filter .2s}
+button:hover{transform:translateY(-3px) scale(1.04);filter:brightness(1.1)}button:active{transform:scale(.95)}
+button.ic{background:var(--glass);color:var(--ink);border:1px solid var(--line);padding:8px 12px;box-shadow:none}
+button.off{opacity:.4}
+button.alt{background:linear-gradient(135deg,var(--p),#ffb347);box-shadow:0 8px 22px rgba(255,79,163,.35)}
+button.ghost{background:var(--glass);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+button:focus-visible{outline:3px solid var(--l);outline-offset:2px}
+main{max-width:1000px;margin:0 auto;padding:20px 18px 70px}
+h2{font-size:2.4rem;margin:.1em 0;line-height:1.1;background:linear-gradient(90deg,#fff,var(--c),var(--p),#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:txt 8s linear infinite}
+@keyframes txt{to{background-position:250% 0}}
+.lead{color:var(--mut);max-width:64ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;perspective:900px;margin-top:18px}
+.box,.card{position:relative;overflow:hidden;border-radius:24px;padding:20px;margin:16px 0}
+.card{margin:0;text-align:left;color:var(--ink);width:100%;display:block;animation:rise .7s both;transition:transform .15s,border-color .3s;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 16px 40px rgba(0,0,0,.32)}
+.card:nth-child(2){animation-delay:.1s}.card:nth-child(3){animation-delay:.2s}
+.card::before,.box::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),rgba(255,255,255,.2),transparent 55%)}
+.card:hover{border-color:var(--c);filter:none}
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.94)}}
+.card .e{font-size:3rem;display:inline-block;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-7px) rotate(8deg)}}
+.card b{display:block;font-size:1.2rem}.card span{color:var(--mut);font-size:.92rem}
+.tag{display:inline-block;margin-top:8px;padding:2px 12px;border-radius:99px;background:rgba(34,225,255,.15);border:1px solid var(--c);color:var(--c);font-weight:700;font-size:.85rem}
+.st{color:var(--y);letter-spacing:2px}
+.box h3{margin:.1em 0 .5em;color:var(--l)}
+.how li{margin:6px 0}
+.lv{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.hud{display:flex;gap:18px;flex-wrap:wrap;font-weight:800;justify-content:space-between;padding:12px 20px}
+.hud i{font-style:normal;color:var(--y)}
+.que{display:flex;gap:10px;min-height:150px;align-items:center;overflow-x:auto;padding:6px}
+.cust{border-radius:20px;padding:10px;min-width:92px;text-align:center;animation:pop .35s cubic-bezier(.3,1.6,.5,1);position:relative}
+.cust .f{font-size:2.3rem}.cust .w{font-size:1.6rem}
+.cust.front{border-color:var(--l);box-shadow:0 0 26px rgba(182,255,92,.55)}
+.pb{height:7px;background:rgba(255,255,255,.15);border-radius:9px;overflow:hidden;margin-top:6px}.pb i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--l))}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+.items{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.item{font-size:2.6rem;padding:14px 30px}
+.pegs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.peg{border-radius:20px;height:290px;display:flex;flex-direction:column-reverse;align-items:center;padding:8px 8px 14px;cursor:pointer;position:relative;transition:.2s}
+.peg::after{content:"";position:absolute;bottom:34px;top:50px;width:10px;background:rgba(255,255,255,.25);border-radius:9px;z-index:0}
+.peg:hover,.peg.sel{border-color:var(--y);box-shadow:0 0 28px rgba(255,211,107,.45)}
+.peg .lb{position:relative;z-index:1;font-weight:800;color:var(--mut);margin-top:4px}
+.disk{position:relative;z-index:1;height:34px;border-radius:12px;margin-top:4px;display:flex;align-items:center;justify-content:center;color:#06122b;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.35);transition:transform .2s;animation:pop .3s}
+.disk.up{transform:translateY(-22px) scale(1.06);box-shadow:0 0 22px #fff}
+.tiles{display:flex;gap:10px;justify-content:center;margin:22px 0;flex-wrap:wrap}
+.tile{width:84px;height:110px;font-size:2rem;color:#06122b;border-radius:18px}
+.tile.sel{outline:4px solid #fff;transform:translateY(-14px)}
+.tile.hint{animation:blink .4s 3}.tile.sw{animation:pop .3s}
+@keyframes blink{50%{filter:brightness(2)}}
+.fb{min-height:1.6em;font-weight:700;text-align:center}
+.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.big{font-size:3rem;text-align:center;letter-spacing:6px;color:var(--y)}
+#help{position:fixed;inset:0;background:rgba(5,6,25,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
+#help.show{display:flex}#help .box{max-width:640px;max-height:90vh;overflow:auto;margin:0}
+@media(max-width:640px){.pegs{gap:6px}.tile{width:60px;height:84px}h2{font-size:1.8rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div><div id="glow"></div><canvas id="fx"></canvas>
+<header>
+  <h1 id="home">🎮 Algo Arcade</h1>
+  <span class="pill" id="sc">⭐ 0</span>
+  <button class="ic" id="bm" title="Musik">🎵</button>
+  <button class="ic" id="bs" title="Suara">🔊</button>
+  <button class="ic" id="bh" title="Petunjuk">❓</button>
+  <button class="ic" id="bf" title="Layar penuh">⛶</button>
+</header>
+<main id="app"></main>
+
+<div id="help"><div class="box">
+  <h3>📖 Petunjuk Penggunaan Game</h3>
+  <ol class="how">
+    <li>Pilih satu dari <b>3 game</b> di menu. Setiap game mengajarkan satu konsep berpikir komputasional.</li>
+    <li>Baca kotak <b>Cara Bermain</b>, pilih level, lalu tekan <b>Main</b>.</li>
+    <li>Raih sampai <b>3 bintang ⭐</b> di setiap level. Bintang tertinggi tersimpan selama halaman terbuka.</li>
+    <li>Tombol 🎵 = musik, 🔊 = efek suara, ⛶ = layar penuh (cocok untuk PID). Klik judul 🎮 untuk kembali ke menu.</li>
+    <li>Bermain berkelompok? Gantian satu orang memegang mouse, yang lain ikut memberi strategi.</li>
+  </ol>
+  <button id="go">Siap Bermain 🚀</button>
+</div></div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+let sOn=true,mOn=false,ac=null,mt=null,st=0,gt=null,best={};
+/* ---------- Audio (Web Audio, tanpa file) ---------- */
+function tone(f,d,t='sine',v=.12){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}
+const sfx={ok:()=>{if(sOn){tone(660,.1,'square',.07);setTimeout(()=>tone(990,.18,'square',.07),90)}burst(px,py,30)},
+ bad:()=>{if(sOn)tone(160,.3,'sawtooth',.09)},tick:()=>{if(sOn)tone(540,.07,'triangle',.1)},
+ push:()=>{if(sOn)tone(440,.1,'triangle',.12)},pop:()=>{if(sOn)tone(330,.1,'triangle',.12)},
+ win:()=>{if(sOn)[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.25,'square',.07),i*130));for(let i=0;i<5;i++)setTimeout(()=>burst(Math.random()*innerWidth,innerHeight*.3,60),i*220)}};
+const mel=[262,330,392,523,392,330,294,392,349,440,523,440,392,330,294,330];
+function music(on){clearInterval(mt);if(!on)return;mt=setInterval(()=>{tone(mel[st%16],.2,'square',.025);if(st%2==0)tone(st%8<4?131:174,.35,'triangle',.07);st++},210)}
+function initAudio(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}
+$('#bm').onclick=()=>{initAudio();mOn=!mOn;$('#bm').classList.toggle('off',!mOn);music(mOn)};
+$('#bs').onclick=()=>{initAudio();sOn=!sOn;$('#bs').classList.toggle('off',!sOn);sfx.tick()};
+$('#bh').onclick=()=>$('#help').classList.add('show');
+$('#bf').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{});
+$('#go').onclick=()=>{initAudio();$('#help').classList.remove('show');if(!mOn){mOn=true;music(true)}$('#bm').classList.toggle('off',!mOn);sfx.ok()};
+$('#bm').classList.add('off');
+$('#home').onclick=()=>{sfx.tick();hub()};
+
+/* ---------- Layar ---------- */
+const app=$('#app'),stars=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+const total=()=>Object.values(best).reduce((a,b)=>a+b,0);
+function stop(){clearInterval(gt);gt=null;document.onkeydown=null}
+const G={
+ queue:{e:'☕',t:'Kasir Kilat',c:'Queue (FIFO)',d:'Layani antrean secepat kilat!',lv:1,run:Q,how:['Pelanggan datang dan <b>masuk dari belakang</b> antrean (enqueue).','Hanya pelanggan <b>paling depan</b> yang boleh dilayani (dequeue). Pertama datang, pertama dilayani = <b>FIFO</b>.','Klik menu yang dipesan pelanggan depan (atau tekan tombol 1, 2, 3).','Salah pesanan atau pelanggan kehabisan sabar = nyawa ❤️ berkurang. Waktu 45 detik.']},
+ stack:{e:'🗼',t:'Menara Tumpukan',c:'Stack (LIFO)',d:'Pindahkan tumpukan piringan ke menara C.',lv:3,run:H,how:['Setiap menara adalah sebuah <b>stack</b>: hanya piringan <b>paling atas</b> yang bisa diambil (pop).','Klik menara asal, lalu klik menara tujuan untuk menaruh piringan (push).','Piringan besar tidak boleh menimpa piringan yang lebih kecil.','Pindahkan semua piringan ke <b>Menara C</b> dengan langkah sesedikit mungkin.']},
+ sort:{e:'🤖',t:'Robot Sorter',c:'Sorting',d:'Urutkan kartu dengan tukar tempat.',lv:3,run:S,how:['Kamu adalah algoritma pengurutan! Urutkan kartu dari <b>kecil ke besar</b>.','Klik satu kartu, lalu klik <b>kartu di sebelahnya</b> untuk menukar (seperti bubble sort).','Langkah tukar dihitung. Makin sedikit makin banyak bintang.','Buntu? Tombol Bantuan 💡 menunjuk pasangan yang salah urut, tapi mengurangi nilai.']}
+};
+function hub(){stop();pts();
+  app.innerHTML=`<h2>Algo Arcade</h2><p class="lead">Tiga game untuk melatih cara berpikir komputer: antre, menumpuk, dan mengurutkan. Kumpulkan semua bintang!</p>
+  <div class="grid">${Object.entries(G).map(([k,g])=>`<button class="card" data-k="${k}"><span class="e">${g.e}</span><b>${g.t}</b><span>${g.d}</span><br><span class="tag">${g.c}</span><div class="st">${[...Array(g.lv)].map((_,i)=>stars(best[k+(g.lv>1?i+1:0)]||0).slice(0,0)+(best[k+(g.lv>1?i+1:0)]?'★':'☆')).join(' ')}</div></button>`).join('')}</div>`;
+  app.querySelectorAll('.card').forEach(b=>b.onclick=()=>{initAudio();sfx.tick();intro(b.dataset.k)});
+}
+function pts(){$('#sc').textContent='⭐ '+total()}
+function intro(k){stop();const g=G[k];
+  app.innerHTML=`<h2>${g.e} ${g.t}</h2><div class="box"><h3>Cara Bermain</h3><ol class="how">${g.how.map(x=>`<li>${x}</li>`).join('')}</ol><p class="lead">Konsep: <b>${g.c}</b></p>
+  <div class="lv">${g.lv>1?[...Array(g.lv)].map((_,i)=>`<button data-l="${i+1}">Level ${i+1}</button>`).join(''):'<button data-l="0">Main ▶</button>'}<button class="ghost" id="bk">← Menu</button></div></div>`;
+  app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{initAudio();sfx.tick();g.run(+b.dataset.l)});
+  $('#bk').onclick=hub;
+}
+function end(k,lv,n,msg){stop();const key=k+lv;best[key]=Math.max(best[key]||0,n);pts();n>1?sfx.win():sfx.bad();
+  app.innerHTML=`<div class="box" style="text-align:center"><h2>${n==3?'Hebat sekali! 🏆':n==2?'Bagus! 👍':'Coba lagi, kamu pasti bisa! 💪'}</h2><div class="big">${stars(n)}</div><p class="lead" style="margin:auto">${msg}</p><div class="lv" style="justify-content:center"><button data-a="1">Main lagi</button>${G[k].lv>1&&lv<G[k].lv&&n>1?'<button class="alt" data-a="2">Level berikutnya ▶</button>':''}<button class="ghost" data-a="3">Menu</button></div></div>`;
+  app.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;sfx.tick();a==1?G[k].run(lv):a==2?G[k].run(lv+1):hub()});
+}
+
+/* ---------- Game 1: Kasir Kilat (Queue) ---------- */
+function Q(){stop();let q=[],lives=3,t=45,sc=0,id=0,sp=0,fin=false;
+  const faces=['😀','😎','🤓','😺','🧑‍🎓','👩‍💻','🧒'],it=['☕','🍔','🍩'];
+  app.innerHTML=`<div class="box hud"><span id="a"></span><span id="b"></span><span id="c"></span></div><div class="box"><b>◀ DEPAN (dilayani lebih dulu)</b><div class="que" id="q"></div></div><div class="box"><p class="fb" id="fb">Layani pelanggan paling depan!</p><div class="items">${it.map((x,i)=>`<button class="item" data-i="${i}">${x}</button>`).join('')}</div></div>`;
+  const draw=()=>{$('#a').innerHTML=`❤️ ${'❤️'.repeat(Math.max(lives,0))}`.replace('❤️ ','Nyawa: ');$('#b').innerHTML=`⏱ <i>${Math.ceil(t)}</i> dtk`;$('#c').innerHTML=`Skor: <i>${sc}</i>`;
+    $('#q').innerHTML=q.map((c,i)=>`<div class="cust ${i?'':'front'}"><div class="f">${c.f}</div><div class="w">💬${it[c.w]}</div><div class="pb"><i style="width:${c.p}%"></i></div></div>`).join('')||'<span class="lead">Antrean kosong...</span>'};
+  const add=()=>{if(q.length<6){q.push({f:faces[id++%7],w:Math.floor(Math.random()*3),p:100});sfx.push()}};
+  const hit=i=>{if(fin||!q.length)return;initAudio();if(q[0].w==i){sc+=10+Math.round(q[0].p/10);q.shift();sfx.ok();sfx.pop();$('#fb').textContent='✅ Dequeue! Pelanggan depan dilayani.'}else{lives--;sfx.bad();$('#fb').textContent='❌ Pesanan salah!';$('#fb').classList.add('shake');setTimeout(()=>$('#fb').classList.remove('shake'),400)}draw();chk()};
+  const chk=()=>{if(!fin&&(lives<=0||t<=0)){fin=true;setTimeout(()=>end('queue',0,sc>=160?3:sc>=90?2:1,`Skor akhir <b>${sc}</b>. Antrean (queue) bekerja FIFO: yang datang lebih dulu harus dilayani lebih dulu.`),500)}};
+  app.querySelectorAll('.item').forEach(b=>b.onclick=()=>hit(+b.dataset.i));
+  document.onkeydown=e=>{if('123'.includes(e.key))hit(+e.key-1)};
+  add();draw();
+  gt=setInterval(()=>{if(fin)return;t-=.1;sp+=100;if(sp>=Math.max(1300,2500-(45-t)*20)){sp=0;add()}
+    q.forEach(c=>c.p-=.6);const n0=q.length;q=q.filter(c=>c.p>0);if(q.length<n0){lives-=n0-q.length;sfx.bad();$('#fb').textContent='😤 Ada pelanggan pergi karena menunggu terlalu lama!'}draw();chk()},100);
+}
+
+/* ---------- Game 2: Menara Tumpukan (Stack / Hanoi) ---------- */
+function H(lv){stop();const n=lv+2,min=2**n-1;let p=[[],[],[]],sel=-1,mv=0;for(let i=n;i>=1;i--)p[0].push(i);
+  app.innerHTML=`<div class="box hud"><span>Level ${lv} · ${n} piringan</span><span>Langkah: <i id="m">0</i> (minimal ${min})</span><button class="ghost" id="rs">↺ Ulang</button></div><div class="pegs" id="pg"></div><p class="fb" id="fb">Klik menara asal untuk <b>pop</b> piringan teratas.</p>`;
+  const say=t=>$('#fb').innerHTML=t;
+  const draw=()=>{$('#m').textContent=mv;$('#pg').innerHTML=p.map((s,k)=>`<div class="peg ${sel==k?'sel':''}" data-k="${k}">${s.map((d,i)=>`<div class="disk ${sel==k&&i==s.length-1?'up':''}" style="width:${46+d*(100/(n+1))*.9}%;background:hsl(${d*52+170},90%,62%)">${d}</div>`).join('')}<span class="lb">Menara ${'ABC'[k]}</span></div>`).join('');
+    app.querySelectorAll('.peg').forEach(e=>e.onclick=()=>click(+e.dataset.k))};
+  const click=k=>{initAudio();
+    if(sel<0){if(!p[k].length){sfx.bad();say('Menara itu kosong, tidak ada yang bisa di-pop.');return}sel=k;sfx.pop();say(`Pop piringan <b>${p[k][p[k].length-1]}</b> dari Menara ${'ABC'[k]}. Taruh di menara mana?`)}
+    else if(sel==k){sel=-1;sfx.tick();say('Dibatalkan, piringan dikembalikan.')}
+    else{const d=p[sel][p[sel].length-1],top=p[k][p[k].length-1];
+      if(top&&d>top){sfx.bad();say(`❌ Piringan ${d} lebih besar dari piringan ${top}. Tidak boleh ditumpuk!`);const e=app.querySelector(`[data-k="${k}"]`);e.classList.add('shake');setTimeout(()=>e.classList.remove('shake'),400);return}
+      p[k].push(p[sel].pop());mv++;sel=-1;sfx.push();say(`Push piringan <b>${d}</b> ke Menara ${'ABC'[k]}.`);
+      if(p[2].length==n){draw();stop();const s=mv<=min?3:mv<=Math.ceil(min*1.4)?2:1;setTimeout(()=>end('stack',lv,s,`Selesai dalam <b>${mv}</b> langkah (minimal ${min}). Stack hanya bisa diambil dari atas, jadi kamu harus memikirkan urutan pop dan push.`),700)}}
+    draw()};
+  $('#rs').onclick=()=>H(lv);draw();
+}
+
+/* ---------- Game 3: Robot Sorter (Sorting) ---------- */
+function S(lv){stop();const n=lv+4;let a,sel=-1,mv=0,hn=0,sw=[];
+  const inv=x=>x.reduce((c,v,i)=>c+x.slice(i+1).filter(w=>w<v).length,0);
+  do{a=[...Array(n)].map((_,i)=>i+1).sort(()=>Math.random()-.5)}while(inv(a)<n);
+  const opt=inv(a),srt=()=>a.every((v,i)=>v==i+1);
+  app.innerHTML=`<div class="box hud"><span>Level ${lv} · ${n} kartu</span><span>Tukar: <i id="m">0</i></span><button class="alt" id="ht">💡 Bantuan</button></div><div class="tiles" id="t"></div><p class="fb" id="fb">Klik satu kartu, lalu kartu di sebelahnya untuk menukar. Urutkan kecil → besar.</p>`;
+  const draw=(h=-1)=>{$('#m').textContent=mv;$('#t').innerHTML=a.map((v,i)=>`<button class="tile ${sel==i?'sel':''} ${sw.includes(i)?'sw':''} ${h>=0&&(i==h||i==h+1)?'hint':''}" data-i="${i}" style="background:hsl(${v*(300/n)},90%,65%)">${v}</button>`).join('');sw=[];
+    app.querySelectorAll('.tile').forEach(b=>b.onclick=()=>click(+b.dataset.i))};
+  const click=i=>{initAudio();
+    if(sel<0){sel=i;sfx.tick()}else if(sel==i){sel=-1;sfx.tick()}
+    else if(Math.abs(sel-i)==1){[a[sel],a[i]]=[a[i],a[sel]];sw=[sel,i];mv++;sel=-1;sfx.push();
+      if(srt()){draw();stop();const e=mv+hn*2,s=e<=opt?3:e<=opt+3?2:1;setTimeout(()=>end('sort',lv,s,`Terurut dengan <b>${mv}</b> tukar (minimal ${opt}) dan ${hn} bantuan. Bubble sort bekerja persis begini: menukar pasangan bersebelahan yang salah urut.`),700);return}}
+    else{sel=i;sfx.bad();$('#fb').textContent='Kartu harus bersebelahan untuk ditukar.'}
+    draw()};
+  $('#ht').onclick=()=>{initAudio();const j=a.findIndex((v,i)=>i<n-1&&v>a[i+1]);if(j<0)return;hn++;sfx.tick();draw(j);$('#fb').textContent=`💡 Kartu ${a[j]} dan ${a[j+1]} salah urut, tukar keduanya.`};
+  draw();
+}
+
+/* ---------- Efek visual & interaksi mouse ---------- */
+const glow=$('#glow'),cv=$('#fx'),cx=cv.getContext('2d');let px=innerWidth/2,py=innerHeight/2,gx=px,gy=py,P=[];
+function rs(){cv.width=innerWidth;cv.height=innerHeight}rs();addEventListener('resize',rs);
+addEventListener('pointermove',e=>{px=e.clientX;py=e.clientY;document.querySelectorAll('.bg i').forEach((b,k)=>b.style.translate=`${(px/innerWidth-.5)*(k+1)*-30}px ${(py/innerHeight-.5)*(k+1)*-30}px`)});
+document.addEventListener('pointermove',e=>{const t=e.target.closest('.card,.box');if(!t)return;const r=t.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;t.style.setProperty('--mx',x+'px');t.style.setProperty('--my',y+'px');
+  if(t.classList.contains('card'))t.style.transform=`rotateX(${(.5-y/r.height)*12}deg) rotateY(${(x/r.width-.5)*14}deg) translateY(-4px)`});
+document.addEventListener('pointerout',e=>{const t=e.target.closest&&e.target.closest('.card');if(t&&!t.contains(e.relatedTarget))t.style.transform=''});
+document.addEventListener('click',e=>{px=e.clientX;py=e.clientY;if(e.target.closest('button,.peg'))burst(px,py,8)});
+function burst(x,y,n=40){for(let i=0;i<n;i++){const a=Math.random()*6.28,v=2+Math.random()*6;P.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-3,l:1,c:['#22e1ff','#b6ff5c','#ff4fa3','#7c5cff','#ffd36b'][i%5],s:3+Math.random()*5})}}
+(function loop(){gx+=(px-gx)*.12;gy+=(py-gy)*.12;glow.style.transform=`translate(${gx}px,${gy}px)`;cx.clearRect(0,0,cv.width,cv.height);
+  P=P.filter(p=>p.l>0);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.25;p.l-=.018;cx.globalAlpha=Math.max(p.l,0);cx.fillStyle=p.c;cx.fillRect(p.x,p.y,p.s,p.s)});requestAnimationFrame(loop)})();
+['0','1','{ }','</>','if','for','push','pop','[ ]','=>','sort','FIFO'].forEach((c,k)=>{const e=document.createElement('span');e.className='sym';e.textContent=c;e.style.cssText=`left:${4+k*8}%;animation-duration:${16+Math.random()*20}s;animation-delay:${-Math.random()*20}s;font-size:${1.2+Math.random()*1.6}rem`;document.body.appendChild(e)});
+
+hub();$('#help').classList.add('show');
+</script>
+</body>
+</html>
